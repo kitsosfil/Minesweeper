@@ -1,0 +1,51 @@
+# Architecture 
+
+
+Class Menu to interface with Board Size , Number of Bombs and Change Board Values
+
+
+class Tile
+class Board 
+class Menu
+class Minesweeper 
+
+# Interactive UI (Resize, Scallable Tile size, Keep Aspect Ration)
+https://stackoverflow.com/questions/11603222/allowing-resizing-window-pygame
+
+# Use a fake screen and scale it on the current surface
+https://stackoverflow.com/questions/34910086/pygame-how-do-i-resize-a-surface-and-keep-all-objects-within-proportionate-to-t
+
+# Menu, pygame-menu
+https://pygame-menu.readthedocs.io/en/4.2.8/
+
+
+add a decorator when a Tile is supposed to be rendered
+
+debug width and height (play with dimensions)
+create fake screen
+    scale it to the display()
+    scale tile size as well
+
+maybe we can remove Board class or merge it with Menu.
+
+DEFAULT SETTINGS
+    MODE: EASY, TILE_SIZE = 30
+    CREATE MENU OBJECT
+    CREATE BOARD OBJECT
+
+DRAW RESOLUTION ON DEFAULT MODE
+    FAKE SCREEN ON PYGAME.display
+    PASS AROUND FAKE SCREEN AND RENDER IT ?
+
+ON WINDOW RESIZE EVENT
+    - GET WIDTH 
+    - FIND APPROPRIATE HEIGHT TO KEEP ASPECT RATIO 
+    - CHANGE TILE SIZE TO FIT TO SCREEN
+    - DRAW ON FAKE SCREEN
+    - RENDER ON WINDOW
+
+ON CHANGE MODE
+    CHANGE MENU ITEM
+    DELETE BOARD OBJECT 
+    CREATE NEW BOARD OBJECT
+
