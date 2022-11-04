@@ -22,17 +22,44 @@ class TileImage(Enum):
     BOMB_CLICKED = pygame.image.load('img/bomb-at-clicked-block.png')
     BOMB_UNCLICKED = pygame.image.load('img/unclicked-bomb.png')
 
+class TileSize():
+    __shared_size = {}
 
+    def __init__(self):
+        self.__dict__ = self.__shared_size
+        self.__global_size = 30
+    @property
+    def globalSize(self):
+        return self.__global_size
     
-class Tile():
-    def __init__(self, size = 30):
-        self.size = size
+    @globalSize.setter
+    def globalSize(self,value):
+        self.__global_size = value
+
+
+class Tile(TileSize):
+    def __init__(self):
+        TileSize.__init__(self)
+        self.__size = self.globalSize
         self.clicked = False
         self.flagged = False
         self.bomb =  False
         self.image = TileImage.UNCLICKED.value
         self.neighbours = None
-        
+    
+    
+    # def getSize(self):
+    #     return self.size
+      
+    # def changeSize(self, size):
+    #     self.size = size
+
+    @property
+    def size(self):
+        return self.globalSize
+    @size.setter
+    def size(self):
+        self.size = self.globalSize
 
     def __repr__(self):
         if self.bomb:
@@ -54,8 +81,6 @@ class Tile():
                 if self.neighbours == 6: pygame.transform.scale(TileImage.SIX.value,(self.size,self.size))
                 if self.neighbours == 7: pygame.transform.scale(TileImage.SEVEN.value,(self.size,self.size))
                 if self.neighbours == 8: pygame.transform.scale(TileImage.EIGHT.value,(self.size,self.size))
-
-
         # image = pygame.transform.scale(pygame.image.load('img/empty-block.png')
         if self.clicked == False:
             self.image =  pygame.transform.scale(TileImage.UNCLICKED.value,(self.size,self.size))
@@ -67,12 +92,6 @@ class Tile():
 
     def setNeighbours(self, neighbours):
         self.neighbours = neighbours
-
-    def getSize(self):
-        return self.size
-    
-    def changeSize(self , size):
-        self.size = size
 
     def isBomb(self):
         return self.bomb

@@ -12,12 +12,18 @@ class BoardTiles(Enum):
 
 class Menu():
     # Initialize Game Parameteres
-    def __init__(self, _mode = Difficulty.HARD.value, _dimensions = BoardTiles.HARD.value):
-        self._mode = _mode
-        self._dimensions = _dimensions
+    def __init__(self, mode = Difficulty.HARD.value, dimensions = BoardTiles.HARD.value):
+        self.__mode = mode
+        self.__dimensions = dimensions
         self.title = 'Menu'
-        
-        
+
+    @property
+    def dimensions(self):
+        return self.__dimensions
+
+    @property
+    def mode(self):
+        return self.__mode
         
 
     

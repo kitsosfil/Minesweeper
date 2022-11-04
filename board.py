@@ -1,20 +1,52 @@
 import random
 from menu import Menu
-from tile import Tile
+from tile import Tile, TileSize
 import pygame
 
 class Board():
     def __init__(self, _settings):
-        # self._mode
-        # self._dimensions
-        self._width, self._height = _settings._dimensions
-        self._mines = _settings._mode
+        self.__width, self.__height = _settings.dimensions
+        self._mines = _settings.mode
+        self.tileSize = TileSize()
         self.createBoard()
         self.on_init
     
-    def on_init(self, surface):
-        size = self._board[0][0].getSize()
+    @property
+    def dimensions(self):
+        return self.__height, self.__width,       
+    @property
+    def height(self):
+        return self.__height
+    @property
+    def width(self):
+        return self.__width
 
+    def adjustTile(self, size): 
+        self.tileSize.globalSize = size
+    
+    def createBoard(self):
+        def createMines():
+        # dictionary as a stack for bombs
+            mines = {} 
+            while len(mines) < self._mines:
+                x, y = random.randint(0, self.width), random.randint(0, self.height)
+                coordinates = (x*self.__width) + y
+                if coordinates not in mines: 
+                    mines[coordinates] = [x,y]
+            return mines    
+
+        mines = createMines()
+        self._board = [ [ Tile() for _ in range(self.height) ] for _  in range(self.width)]
+        # Add Bombs
+        for mine in mines.keys():
+            x = mines[mine][0] // self.width
+            y = mines[mine][1] % self.height
+            self._board[x][y].bomb = True
+            # get content, assign bomb
+        
+    def on_init(self, surface):
+        #size = self._board[0][0].size
+        size = self.tileSize.globalSize
         #image = pygame.transform.scale(pygame.image.load('img/empty-block.png'),(self._board[0][0].getSize(),self._board[0][0].getSize()))
         for i in range(len(self._board)):
             for j in range(len(self._board[0])):                        
@@ -23,54 +55,24 @@ class Board():
         pygame.display.flip()
     
     def on_render(self, surface):
-        size = self._board[0][0].getSize()
-        for i in range(self._width):
-            for j in range(self._height):                        
+        #size = self._board[0][0].size
+        size = self.tileSize.globalSize
+        for i in range(self.width):
+            for j in range(self.height):                        
                 image = self._board[i][j].getTile()
                 surface.blit(image, (i * size, j * size))        
         return surface
 
-
-    def createBoard(self):
-        mines = self.createMines()
-        self._board = [ [ Tile() for _ in range(self._height) ] for _  in range(self._width)]    
-                
-        # Add Bombs
-        for mine in mines.keys():
-            x = mines[mine][0] // self._width
-            y = mines[mine][1] % self._height
-            self._board[x][y].bomb = True
-            # get content, assign bomb
-        
-    
-    def createMines(self):
-        # dictionary as a stack for bombs
-        mines = {} 
-        while len(mines) < self._mines:
-            x, y = random.randint(0, self._width), random.randint(0, self._height)
-            coordinates = (x*self._width) + y
-            if coordinates not in mines: 
-                mines[coordinates] = [x,y]
-        return mines
-
-    def get_dimensions(self):
-        return self._height, self._width,       
-    
-    def adjustTile(self, size):
-        for row in range(self._width):
-            for column in range(self._height):
-                self._board[row][column].changeSize(size)
-
     # check for content
     def tileContent(self):   
-        for row in range(self._width):
-            for column in range(self._height):
+        for row in range(self.width):
+            for column in range(self.height):
                 bombCounter = 0 
                 if not(self._board[row][column].bomb):
                     up = True if row > 0 else False
-                    down = True if row < self._height-1 else False
+                    down = True if row < self.height-1 else False
                     left = True if column > 0  else False
-                    right = True if column < self._width - 1  else False
+                    right = True if column < self.width - 1  else False
                     
                     if up:
                         bombCounter += 1 if self._board[row - 1][column].bomb else 0
