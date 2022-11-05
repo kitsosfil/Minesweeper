@@ -4,6 +4,8 @@ import pygame_menu
 from menu import Menu
 from board import Board
 
+from types import SimpleNamespace
+
 class Minesweeper():
     
     def __init__(self):
@@ -36,46 +38,21 @@ class Minesweeper():
 
     # Handle events
     def on_event(self, event):
-        # poll = pygame.event.poll()
-        # print(pygame.event.wait())
-        buttons = pygame.mouse.get_pressed()
-        pressed = ""
-        action = ""
         if event.type == pygame.QUIT:
             self._running = False
-        # Button Pressed
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            # Block MouseMotion -> pygame.event.set_blocked(1024)
-            # Allow MouseMotion -> pygame.event.set_allowed(1024)
-            # pygame.event.wait() ???
-            if event.button == 1:
-                # Action: Open Tile
-                action = "Pressed | Open Tile "
-                column, row = (event.pos[0] // self._board.tileSize.globalSize, event.pos[1] // self._board.tileSize.globalSize)
-                pressed += "m1"
-            if event.button == 3:
-                # Action: Flag Tile
-                action = "Pressed | Flag Tile"
-                column, row = (event.pos[0] // self._board.tileSize.globalSize, event.pos[1] // self._board.tileSize.globalSize)
-                pressed += "m2"
-            print(action, pressed, column, row)
-
-        # Button Released  
-        elif event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
-                # Action: Open Tile
-                action = "Released | Open Tile"
-                column, row = (event.pos[0] // self._board.tileSize.globalSize, event.pos[1] // self._board.tileSize.globalSize)
-            if event.button == 3:
-                # Action: Flag Tile
-                action = "Released | Flag Tile"
-                column, row = (event.pos[0] // self._board.tileSize.globalSize, event.pos[1] // self._board.tileSize.globalSize)
-            
-            print(action, pressed, column, row)
-            
-        # video resize
         elif event.type == pygame.VIDEORESIZE:
             self.resize(event.size)
+        # Button Pressed
+        # elif event.type == pygame.MOUSEBUTTONDOWN:
+        #     # Block MouseMotion -> pygame.event.set_blocked(1024)
+        #     # Allow MouseMotion -> pygame.event.set_allowed(1024)
+        #     if event.button == 1:
+        #         # Action: Open Tile
+        #         output = {"event" : event.type, "pygameButtons": pygame.mouse.get_pressed(), "row" : event.pos[1] // self._board.tileSize.globalSize, "column": event.pos[0] // self._board.tileSize.globalSize}
+        #     if event.button == 3:
+        #         output = {"event" : event.type, "pygameButtons": pygame.mouse.get_pressed(), "row" : event.pos[1] // self._board.tileSize.globalSize, "column": event.pos[0] // self._board.tileSize.globalSize}
+        
+         
         
     # def on_init(self):
     #     image = pygame.transform.scale(pygame.image.load('img/empty-block.png'),(self._board._board[0][0].getSize(),self._board._board[0][0].getSize()))
@@ -101,13 +78,32 @@ class Minesweeper():
     def run(self):
         
         pygame.init()
+        buttons = []
         while self._running:
-            actions = []
+            pygame.event.set_blocked(1024)      
             for event in [pygame.event.wait()]+pygame.event.get():
-                actions.append(self.on_event(event)) 
+                # Maybe this can be moved in the on_event function by refercing back and forth the buttos array-object
+                # also if len(buttons) >= 2 we can implement an animation on the tiles and move them accordingly with the mouse
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    buttons.append(SimpleNamespace(
+                        eventID = event.type,
+                        buttons = (pygame.mouse.get_pressed()[0], pygame.mouse.get_pressed()[2]), 
+                        row = event.pos[1] // self._board.tileSize.globalSize, 
+                        column = event.pos[0] // self._board.tileSize.globalSize))
+                elif event.type == pygame.MOUSEBUTTONUP and buttons != []:
+                    buttons.append(SimpleNamespace(
+                        eventID = event.type,
+                        buttons = (pygame.mouse.get_pressed()[0], pygame.mouse.get_pressed()[2]), 
+                        row = event.pos[1] // self._board.tileSize.globalSize, 
+                        column = event.pos[0] // self._board.tileSize.globalSize))
+                    self._board.action(buttons)
+                    buttons = []
+                elif event.type == pygame.VIDEORESIZE or event.type == pygame.QUIT: 
+                    self.on_event(event)
+                    buttons = []
+            
             self.on_render()
             pygame.display.flip()
-            print(actions)            
         pygame.quit()
 
 
