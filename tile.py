@@ -22,72 +22,74 @@ class TileImage(Enum):
     BOMB_CLICKED = pygame.image.load('img/bomb-at-clicked-block.png')
     BOMB_UNCLICKED = pygame.image.load('img/unclicked-bomb.png')
 
-class TileSize():
-    __shared_size = {}
+# class TileSize():
+#     __shared_state = {}
 
-    def __init__(self):
-        self.__dict__ = self.__shared_size
-        self.__global_size = 30
-    @property
-    def globalSize(self):
-        return self.__global_size
+#     def __init__(self):
+#         self.__dict__ = self.__shared_state 
+#         self.__global_size = 30
+
+#     @property
+#     def globalSize(self):
+#         return self.__global_size
     
-    @globalSize.setter
-    def globalSize(self,value):
-        self.__global_size = value
+#     @globalSize.setter
+#     def globalSize(self,value):
+#         self.__global_size = value
 
 
-class Tile(TileSize):
-    def __init__(self):
-        TileSize.__init__(self)
-        self.__size = self.globalSize
+class Tile():
+    __size = 30
+    def changeSize(value):
+        Tile.__size = value
+    
+    def __init__(self):       
+        self.opened = False
         self.clicked = False
         self.flagged = False
-        self.bomb =  False
+        self.__bomb =  False
         self.image = TileImage.UNCLICKED.value
-        self.neighbours = None
-    
-    
-    # def getSize(self):
-    #     return self.size
-      
-    # def changeSize(self, size):
-    #     self.size = size
+        self.neighbours = False
 
     @property
     def size(self):
-        return self.globalSize
-    @size.setter
-    def size(self):
-        self.size = self.globalSize
 
+        return Tile.__size
+    #@size.setter
+   
+    @property
+    def bomb(self):
+        return self.__bomb
+    @bomb.setter
+    def bomb(self, value):
+        self.__bomb = value
+    
     def __repr__(self):
-        if self.bomb:
-            return '*'
-        else:
-            return ' '
+        # if self.bomb:
+        #     return '*'
+        # else:
+        return str(self.neighbours)
     
     def getTile(self):
         if self.clicked:
+            self.image =  pygame.transform.scale(TileImage.BOMB_CLICKED.value,(self.size,self.size))
+        elif self.opened:
             if self.bomb:
                 self.image =  pygame.transform.scale(TileImage.BOMB_CLICKED.value,(self.size,self.size))
             else:
-                if self.neighbours == 0: pygame.transform.scale(TileImage.ZERO.value,(self.size,self.size))
-                if self.neighbours == 1: pygame.transform.scale(TileImage.ONE.value,(self.size,self.size))
-                if self.neighbours == 2: pygame.transform.scale(TileImage.TWO.value,(self.size,self.size))
-                if self.neighbours == 3: pygame.transform.scale(TileImage.THREE.value,(self.size,self.size))
-                if self.neighbours == 4: pygame.transform.scale(TileImage.FOUR.value,(self.size,self.size))
-                if self.neighbours == 5: pygame.transform.scale(TileImage.FIVE.value,(self.size,self.size))
-                if self.neighbours == 6: pygame.transform.scale(TileImage.SIX.value,(self.size,self.size))
-                if self.neighbours == 7: pygame.transform.scale(TileImage.SEVEN.value,(self.size,self.size))
-                if self.neighbours == 8: pygame.transform.scale(TileImage.EIGHT.value,(self.size,self.size))
-        # image = pygame.transform.scale(pygame.image.load('img/empty-block.png')
-        if self.clicked == False:
-            self.image =  pygame.transform.scale(TileImage.UNCLICKED.value,(self.size,self.size))
-            #self.image = TileImage.UNCLICKED.value.get_rect().inflate(self.size,self.size)
+                if self.neighbours == 0: self.image = pygame.transform.scale(TileImage.ZERO.value,(self.size,self.size))
+                if self.neighbours == 1: self.image = pygame.transform.scale(TileImage.ONE.value,(self.size,self.size))
+                if self.neighbours == 2: self.image = pygame.transform.scale(TileImage.TWO.value,(self.size,self.size))
+                if self.neighbours == 3: self.image = pygame.transform.scale(TileImage.THREE.value,(self.size,self.size))
+                if self.neighbours == 4: self.image = pygame.transform.scale(TileImage.FOUR.value,(self.size,self.size))
+                if self.neighbours == 5: self.image = pygame.transform.scale(TileImage.FIVE.value,(self.size,self.size))
+                if self.neighbours == 7: self.image = pygame.transform.scale(TileImage.SEVEN.value,(self.size,self.size))
+                if self.neighbours == 8: self.image = pygame.transform.scale(TileImage.EIGHT.value,(self.size,self.size))
+                if self.neighbours == 6: self.image = pygame.transform.scale(TileImage.SIX.value,(self.size,self.size))
         elif self.flagged:
             self.image =  pygame.transform.scale(TileImage.FLAG.value,(self.size,self.size))
-            # self.image = TileImage.FLAG.value.get_rect().inflate(self.size,self.size)
+        elif self.clicked == False:
+            self.image =  pygame.transform.scale(TileImage.UNCLICKED.value,(self.size,self.size))
         return self.image
 
     def setNeighbours(self, neighbours):

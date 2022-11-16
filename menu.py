@@ -7,8 +7,8 @@ class Difficulty(Enum):
 
 class BoardTiles(Enum):
     EASY = (9,9)
-    MEDIUM = (15,15)
-    HARD = (35,22)
+    MEDIUM = (16,16)
+    HARD = (16, 30)
 
 class Menu():
     # Initialize Game Parameteres

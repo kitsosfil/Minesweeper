@@ -15,6 +15,7 @@ class Minesweeper():
         self._board = Board(self._settings)
         self.UI = pygame.display.set_caption(" Minesweeper ")
         self.UI = pygame.display.set_mode(self.resolution(), pygame.RESIZABLE)# | pygame.NOFRAME | pygame.SCALED) 
+        print(self.resolution())
         self._surface = self.createFake() 
         self._board.on_init(self._surface)
        
@@ -25,8 +26,8 @@ class Minesweeper():
 
     def resolution(self):
         # Default resolution 
-        print(list(map(lambda d: d* self._board._board[0][0].size, self._settings.dimensions)))
-        w, h = list(map(lambda d: d* self._board._board[0][0].size, self._settings.dimensions))
+        h, w = list(map(lambda d: d* self._board._board[0][0].size, self._settings.dimensions))
+        #print(f"resolution width: {w}, height: {h}")
         return (w,h)
         #self._surface.fill((210,210,210))
 
@@ -63,45 +64,49 @@ class Minesweeper():
     
     def resize(self, size):
         width = size[0]
-        w,h = self._settings.dimensions
-        height = (h/w) * width
-        self._board.adjustTile(width/w)
+        rows, columns = self._settings.dimensions
+        height = (rows/columns) * width
+        self._board.adjustTile(width/columns)
         self.UI = pygame.display.set_mode((width,height), pygame.RESIZABLE)# | pygame.NOFRAME | pygame.SCALED) 
         
-
     def on_render(self):
         surface = self._board.on_render(self.createFake())
         self.UI.blit(pygame.transform.scale(surface, self.UI.get_rect().size), (0,0))     
-        
-       
 
     def run(self):
-        
         pygame.init()
         buttons = []
+        pygame.event.set_blocked(1024)      
         while self._running:
-            pygame.event.set_blocked(1024)      
             for event in [pygame.event.wait()]+pygame.event.get():
-                # Maybe this can be moved in the on_event function by refercing back and forth the buttos array-object
-                # also if len(buttons) >= 2 we can implement an animation on the tiles and move them accordingly with the mouse
+                print(event)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     buttons.append(SimpleNamespace(
                         eventID = event.type,
                         buttons = (pygame.mouse.get_pressed()[0], pygame.mouse.get_pressed()[2]), 
-                        row = event.pos[1] // self._board.tileSize.globalSize, 
-                        column = event.pos[0] // self._board.tileSize.globalSize))
+                        row = int(event.pos[1] // self._board.tileSize),
+                        column = int(event.pos[0] // self._board.tileSize)))
+                    pygame.event.set_allowed(1024)
+                elif event.type == pygame.MOUSEMOTION:
+                    buttons.append(SimpleNamespace(
+                        eventID = event.type,
+                        buttons = (pygame.mouse.get_pressed()[0], pygame.mouse.get_pressed()[2]), 
+                        row = int(event.pos[1] // self._board.tileSize),
+                        column = int(event.pos[0] // self._board.tileSize)))
                 elif event.type == pygame.MOUSEBUTTONUP and buttons != []:
                     buttons.append(SimpleNamespace(
                         eventID = event.type,
                         buttons = (pygame.mouse.get_pressed()[0], pygame.mouse.get_pressed()[2]), 
-                        row = event.pos[1] // self._board.tileSize.globalSize, 
-                        column = event.pos[0] // self._board.tileSize.globalSize))
+                        row = int(event.pos[1] // self._board.tileSize),
+                        column = int(event.pos[0] // self._board.tileSize)))
+                    
                     self._board.action(buttons)
                     buttons = []
+                    pygame.event.set_blocked(1024)      
                 elif event.type == pygame.VIDEORESIZE or event.type == pygame.QUIT: 
                     self.on_event(event)
                     buttons = []
-            
+                self._board.animate(buttons)
             self.on_render()
             pygame.display.flip()
         pygame.quit()
