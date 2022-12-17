@@ -14,14 +14,8 @@ class Minesweeper
 https://pygame-menu.readthedocs.io/en/4.2.8/
 
 
-add a decorator when a Tile is supposed to be rendered
-    When a click even happens on Board we start exploring the board to see which tiles should open
-    Then each Tile should switch its status to clicked and reveal its content.
-    
 
-debug width and height (play with dimensions)
 
-maybe we can remove Board class or merge it with Menu.
 
 DEFAULT SETTINGS
     MODE: EASY, TILE_SIZE = 30
@@ -35,3 +29,81 @@ ON CHANGE MODE
 
 
 Events 
+    Click on Board Events
+
+        Concurent events:
+            Drag and MouseMotion (Enable MouseMotion Event)
+            Right + Left Click
+            -- Maybe I can play with the time and clock sync in pygame, seems like (it can register some double clicks so if I slow the game down it might be able to register both clicks easier)
+            Handle events in Queue into main code
+            hold mousedown and mousemotion in dict
+            on mouseup read the dict and call the approriate action
+            that dict should exist in main code 
+
+    Resize
+    Quit
+
+    TBD: 
+        # Add Minimum Width 
+        
+        # Menu UI
+            - On click change Face
+            - On timer event change Clock   DONE
+            - On flag change Bomb Counter
+            
+            - On resize change menu dimensions DONE
+                - What happens on full screen
+            
+        # Surfaces 
+            - Dimensions of whole board
+            - Dimensions 
+        
+        Add a decorator when a Tile is supposed to be rendered
+            - When a click even happens on Board we start exploring the board to see which tiles should open. 
+            Then each Tile should switch its status to clicked and reveal its content.
+
+        Change handling of fake screen, only draw the tiles that changed
+        
+        Use observer pattern to handle mouseclicks ?
+    
+
+
+
+
+
+we have to handle event queue
+    pygame.event.get()  -> gets events from event queue and handles them appropriately
+    pygame.event.poll() -> get a single event
+    pygame.event.pump() -> adds event into the event queue
+    pygame.event.peek() -> checks if a specific event.type exists in queue
+    pygame.event.wait() -> waits for an event to happen and returns one
+    # Function to handle     
+
+class Clock():
+   
+    def __init__(self):
+        self.internal = pygame.time.Clock()
+        self.seconds = 0
+        self.timer_event = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.timer_event, 1000)
+        # self.start_ticks = pygame.time.get_ticks()
+        # self.__time = 0
+        
+    @property
+    def time(self):
+        return self.__time
+
+    @time.setter
+    def checkTime(self, value):
+        previous_time = int(self.__time)
+        self.__time = (value - self.start_ticks)/1000
+        if int(self.time) != previous_time:
+            print(f"Setter was called: {int(self.time)}")
+            #print(tuple(self.drawClock()))
+
+    def drawClock(self):
+        digits = []
+        for number in NUMBERS:
+            digits.append(number)
+        self.checkTime = pygame.time.get_ticks()
+        return (digits[i] for i in list(map(int,(self.time//100, self.time//10, self.time % 10))))
